@@ -38,7 +38,7 @@ namespace g80 {
 
     private:
         const Dim N_;
-        Dim FLY_RADIUS_{25};
+        Dim FLY_RADIUS_{20};
         Dim MAX_FLY_INIT_ANGLE{20};
         Dim TAIL_;
 
@@ -85,19 +85,23 @@ namespace g80 {
 
     auto Demo::init_flies() -> bool {
         
-        float sample_per_row = 1.0f * N_ / BMP_->h;         
-        float size_of_each_step = BMP_->w / sample_per_row;
+        SDL_Surface *bmp = SDL_CreateRGBSurface(0, BMP_->w, BMP_->h, 32, 0, 0, 0, 0);
+        SDL_BlitSurface(BMP_, NULL, bmp, NULL );
+        // return true;
+
+        float sample_per_row = 1.0f * N_ / bmp->h;         
+        float size_of_each_step = bmp->w / sample_per_row;
         float x = 0.0f, y = 0.0f;
 
         for (Dim i = 0; i < N_; ++i) {
-            Uint32 *pixel = static_cast<Uint32 *>(BMP_->pixels) + (int)(y * BMP_->w) + (int)(x * size_of_each_step);
-            Uint8 r, g, b, a;
-            SDL_GetRGBA(*pixel, BMP_->format, &r, &g, &b, &a);
+            Uint32 *pixel = static_cast<Uint32 *>(bmp->pixels) + (int)(y * bmp->w) + (int)(x * size_of_each_step);
+            Uint8 r, g, b;
+            SDL_GetRGB(*pixel, bmp->format, &r, &g, &b);
 
             flies_.emplace_back(Fly{
-                static_cast<Dim>(x * size_of_each_step), 
-                static_cast<Dim>(y),
-                SDL_MapRGBA(BMP_->format, r, g, b, a),
+                surface_->w / 2 - bmp->w / 2 + static_cast<Dim>(x * size_of_each_step), 
+                surface_->h / 2 - bmp->h / 2 + static_cast<Dim>(y),
+                SDL_MapRGBA(surface_->format, r, g, b, 255),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
@@ -108,6 +112,8 @@ namespace g80 {
                 ++y;
             }
         }
+
+        SDL_FreeSurface(bmp);
 
         return true;
     }
