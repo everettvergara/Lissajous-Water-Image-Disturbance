@@ -38,7 +38,7 @@ namespace g80 {
 
     private:
         const Dim N_;
-        Dim FLY_RADIUS_{5};
+        Dim FLY_RADIUS_{25};
         Dim MAX_FLY_INIT_ANGLE{20};
         Dim TAIL_;
 
@@ -84,29 +84,31 @@ namespace g80 {
     }
 
     auto Demo::init_flies() -> bool {
+        
+        float sample_per_row = 1.0f * N_ / BMP_->h;         
+        float size_of_each_step = BMP_->w / sample_per_row;
+        float x = 0.0f, y = 0.0f;
 
-        Dim no_of_steps = (BMP_->w * BMP_->h) / N_;
-        Dim x_sample_size = BMP_->w / no_of_steps;
-
-        Dim y = 0; 
         for (Dim i = 0; i < N_; ++i) {
-            Uint32 *pixel = static_cast<Uint32 *>(BMP_->pixels) + (i * no_of_steps) + rnd() % no_of_steps;
+            Uint32 *pixel = static_cast<Uint32 *>(BMP_->pixels) + (int)(y * BMP_->w) + (int)(x * size_of_each_step);
             Uint8 r, g, b, a;
             SDL_GetRGBA(*pixel, BMP_->format, &r, &g, &b, &a);
-            
-            Dim x = i % x_sample_size; // (i * no_of_steps % BMP_->w) + (rnd() % no_of_steps);
 
             flies_.emplace_back(Fly{
-                x, y,
+                static_cast<Dim>(x * size_of_each_step), 
+                static_cast<Dim>(y),
                 SDL_MapRGBA(BMP_->format, r, g, b, a),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
                 static_cast<Dim16>(1 + rnd() % FLY_RADIUS_)});
 
-            if (i > 0 && i % x_sample_size == 0) ++y;   
+            if (++x >= sample_per_row) {
+                x = 0.0f;
+                ++y;
+            }
         }
-        // std::cout << "y: " << y << "\n";
+
         return true;
     }
 

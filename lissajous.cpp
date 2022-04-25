@@ -10,7 +10,7 @@ auto set_default_vconfig() -> VideoConfig;
 auto main(int argc, char *argv[]) -> int {
 
     VideoConfig vconfig {set_default_vconfig()};
-    Demo demo(400000, "/Users/everett/Documents/Codes/Projects/Lissajous-Image/assets/sample-image.bmp");
+    Demo demo(25000, "/Users/everett/Documents/Codes/Projects/Lissajous-Image/assets/sample-image.bmp");
 
     if (!demo.is_init() ||
         !demo.create_window(set_default_vconfig()) ||
