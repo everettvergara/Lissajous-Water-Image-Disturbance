@@ -86,13 +86,15 @@ namespace g80 {
     auto Demo::init_flies() -> bool {
 
         Dim no_of_steps = (BMP_->w * BMP_->h) / N_;
+        Dim x_sample_size = BMP_->w / no_of_steps;
 
-        for (Dim i = 0, y = 0; i < N_; ++i) {
+        Dim y = 0; 
+        for (Dim i = 0; i < N_; ++i) {
             Uint32 *pixel = static_cast<Uint32 *>(BMP_->pixels) + (i * no_of_steps) + rnd() % no_of_steps;
             Uint8 r, g, b, a;
             SDL_GetRGBA(*pixel, BMP_->format, &r, &g, &b, &a);
             
-            Dim x = (i * no_of_steps % BMP_->w) + rnd() % no_of_steps;
+            Dim x = i % x_sample_size; // (i * no_of_steps % BMP_->w) + (rnd() % no_of_steps);
 
             flies_.emplace_back(Fly{
                 x, y,
@@ -102,8 +104,9 @@ namespace g80 {
                 static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
                 static_cast<Dim16>(1 + rnd() % FLY_RADIUS_)});
 
-            if (i % BMP_->w) ++y;   
+            if (i > 0 && i % x_sample_size == 0) ++y;   
         }
+        // std::cout << "y: " << y << "\n";
         return true;
     }
 
