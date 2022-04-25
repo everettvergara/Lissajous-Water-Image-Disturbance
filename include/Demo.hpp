@@ -38,7 +38,7 @@ namespace g80 {
 
     private:
         const Dim N_;
-        Dim FLY_RADIUS_{10};
+        Dim FLY_RADIUS_{20};
         Dim MAX_FLY_INIT_ANGLE{20};
         Dim TAIL_;
 
@@ -102,6 +102,7 @@ namespace g80 {
                 surface_->w / 2 - bmp->w / 2 + static_cast<Dim>(x * size_of_each_step), 
                 surface_->h / 2 - bmp->h / 2 + static_cast<Dim>(y),
                 SDL_MapRGBA(surface_->format, r, g, b, 255),
+                SDL_MapRGBA(surface_->format, r / 1.5, g / 1.5, b / 1.5, 255),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
@@ -145,14 +146,12 @@ namespace g80 {
         SDL_LockSurface(surface_);
 
         // Erase
-        Color prev = 0;
         for (auto &fly : flies_) {
             Dim x = fly.cx + fly.xr * cosf_[fly.xta];
             Dim y = fly.cy + fly.yr * sinf_[fly.yta];
             fly.xta = (fly.xta + fly.xan) % 360;
             fly.yta = (fly.yta + fly.yan) % 360;
-            set_pixel(x, y, 0);
-            prev = fly.c;
+            set_pixel(x, y, fly.e);
         }
 
         // Update and Draw

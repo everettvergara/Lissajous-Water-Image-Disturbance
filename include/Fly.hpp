@@ -10,6 +10,7 @@ namespace g80 {
         Dim32 cx;
         Dim32 cy;
         Color c;
+        Color e;
 
         Dim16 xan;
         Dim16 yan;
