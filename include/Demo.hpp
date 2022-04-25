@@ -18,7 +18,7 @@ namespace g80 {
     class Demo : public Video {
 
     public: 
-        Demo (const Dim N, const std::string &bmp_file, const Dim TAIL = 2) : 
+        Demo (const Dim N, const std::string &bmp_file, const Dim TAIL = 5) : 
             N_(N),
             TAIL_(TAIL),
             BMP_(SDL_LoadBMP(bmp_file.c_str())) {
@@ -38,7 +38,7 @@ namespace g80 {
 
     private:
         const Dim N_;
-        Dim FLY_RADIUS_{20};
+        Dim FLY_RADIUS_{10};
         Dim MAX_FLY_INIT_ANGLE{20};
         Dim TAIL_;
 
@@ -151,7 +151,7 @@ namespace g80 {
             Dim y = fly.cy + fly.yr * sinf_[fly.yta];
             fly.xta = (fly.xta + fly.xan) % 360;
             fly.yta = (fly.yta + fly.yan) % 360;
-            set_pixel(x, y, prev);
+            set_pixel(x, y, 0);
             prev = fly.c;
         }
 
