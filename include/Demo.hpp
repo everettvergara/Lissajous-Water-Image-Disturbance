@@ -145,12 +145,14 @@ namespace g80 {
         SDL_LockSurface(surface_);
 
         // Erase
+        Color prev = 0;
         for (auto &fly : flies_) {
             Dim x = fly.cx + fly.xr * cosf_[fly.xta];
             Dim y = fly.cy + fly.yr * sinf_[fly.yta];
             fly.xta = (fly.xta + fly.xan) % 360;
             fly.yta = (fly.yta + fly.yan) % 360;
-            set_pixel(x, y, 0);
+            set_pixel(x, y, prev);
+            prev = fly.c;
         }
 
         // Update and Draw
