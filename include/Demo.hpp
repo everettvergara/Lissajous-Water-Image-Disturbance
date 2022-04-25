@@ -102,7 +102,7 @@ namespace g80 {
                 surface_->w / 2 - bmp->w / 2 + static_cast<Dim>(x * size_of_each_step), 
                 surface_->h / 2 - bmp->h / 2 + static_cast<Dim>(y),
                 SDL_MapRGBA(surface_->format, r, g, b, 255),
-                SDL_MapRGBA(surface_->format, r / 1.5, g / 1.5, b / 1.5, 255),
+                SDL_MapRGBA(surface_->format, r / 1.25, g / 1.25, b / 1.25, 255),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
