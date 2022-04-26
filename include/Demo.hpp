@@ -59,7 +59,7 @@ namespace g80 {
             return rand = (rand * a + c) % m; 
         }
 
-        auto get_fitted_rect(const SDL_Rect &rect_from, const SDL_Rect &rect_to) -> SDL_Rect;
+        auto get_fitted_rect(int w_from, int h_from, int w_to, int h_to) -> SDL_Rect {
         auto init_sincos_table() -> bool;
         auto init_reserved_flies() -> bool;
         auto init_flies() -> bool;
@@ -87,32 +87,21 @@ namespace g80 {
         return true;
     }
 
-    auto Demo::get_fitted_rect(const SDL_Rect &rect_from, const SDL_Rect &rect_to) -> SDL_Rect {
+    auto Demo::get_fitted_rect(int w_from, int h_from, int w_to, int h_to) -> SDL_Rect {
 
-        if (rect_from.w <= rect_to.w && rect_from.h <= rect_to.h)
-            return rect_from;
+        if (w_from <= w_to && h_from <= h_to)
+            return {w_to / 2 - w_from / 2, h_to / 2 - h_from / 2, w_from, h_to};
         
-        SDL_Rect return_rect{rect_from};
-        
-        if (return_rect.w > rect_to.w) {
-            float ar = return_rect.w / rect_to.w;
-            return_rect.w /= ar;
-            return_rect.h /= ar;
-        }
-
-        if (return_rect.h > rect_to.h) {
-            float ar = return_rect.h / rect_to.h;
-            return_rect.w /= ar;
-            return_rect.h /= ar;
-        }
-
-        return return_rect;
-        
+        int w = w_from, h = h_from;
+        if (w > w_to) {float ar = w / w_to; w /= ar; h /= ar;}
+        if (h > h_to) {float ar = h / h_to; w /= ar; h /= ar;}
+        return {w_to / 2 - w_from / 2, h_to / 2 - h_from / 2, w, h};
     }
+
     auto Demo::init_flies() -> bool {
         
         SDL_Surface *bmp = SDL_CreateRGBSurface(0, BMP_->w, BMP_->h, 32, 0, 0, 0, 0);
-
+        SDL_Rect fitted_rect = get_fitted_rect({0, 0, bmp->w, bmp->h}, {0, 0, static_cast<int>(surface_->w * 0.90f), static_cast<int>(surface_->h * 0.90f)})
 
         
 
