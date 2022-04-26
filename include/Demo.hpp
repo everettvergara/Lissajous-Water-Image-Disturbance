@@ -58,6 +58,8 @@ namespace g80 {
             static RandNum rand = (seed * a + c) % m;
             return rand = (rand * a + c) % m; 
         }
+
+        auto get_fitted_rect(const SDL_Rect &rect_from, const SDL_Rect &rect_to) -> SDL_Rect;
         auto init_sincos_table() -> bool;
         auto init_reserved_flies() -> bool;
         auto init_flies() -> bool;
@@ -85,10 +87,39 @@ namespace g80 {
         return true;
     }
 
+    auto Demo::get_fitted_rect(const SDL_Rect &rect_from, const SDL_Rect &rect_to) -> SDL_Rect {
+
+        if (rect_from.w <= rect_to.w && rect_from.h <= rect_to.h)
+            return rect_from;
+        
+        SDL_Rect return_rect{rect_from};
+        
+        if (return_rect.w > rect_to.w) {
+            float ar = return_rect.w / rect_to.w;
+            return_rect.w /= ar;
+            return_rect.h /= ar;
+        }
+
+        if (return_rect.h > rect_to.h) {
+            float ar = return_rect.h / rect_to.h;
+            return_rect.w /= ar;
+            return_rect.h /= ar;
+        }
+
+        return return_rect;
+        
+    }
     auto Demo::init_flies() -> bool {
         
         SDL_Surface *bmp = SDL_CreateRGBSurface(0, BMP_->w, BMP_->h, 32, 0, 0, 0, 0);
-        SDL_BlitSurface(BMP_, NULL, bmp, NULL);
+
+
+        
+
+
+        // SDL_Rect center_rect {0, 0, };
+        // SDL_BlitSurface(BMP_, NULL, surface_, &center_rect);
+        // SDL_BlitSurface(BMP_, NULL, bmp, NULL);
         //SDL_BlitSurface(BMP_, NULL, surface_, {surface_->w / 2 - bmp->w / 2, surface_->h / 2 - bmp->h / 2});
         return true;
 
