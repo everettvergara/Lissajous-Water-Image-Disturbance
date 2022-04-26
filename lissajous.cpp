@@ -11,7 +11,10 @@ auto main(int argc, char *argv[]) -> int {
 
     VideoConfig vconfig {set_default_vconfig()};
     // The bounds of the lissajous flies must not be beyond the dim of the image
-    Demo demo(450000, {0, 700, 1920, 500}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Disturbance/assets/sample-image2.bmp");
+    // Demo demo(450000, {0, 700, 1920, 500}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Disturbance/assets/sample-image2.bmp");
+    
+    // bug in sample image1. not getting the h of the image.
+    Demo demo(100000, {0, 370, 622, 560}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Disturbance/assets/sample-image.bmp");
 
     if (!demo.is_init() ||
         !demo.create_window(set_default_vconfig()) ||
