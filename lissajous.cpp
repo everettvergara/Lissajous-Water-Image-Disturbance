@@ -13,8 +13,11 @@ auto main(int argc, char *argv[]) -> int {
     // The bounds of the lissajous flies must not be beyond the dim of the image
     // Demo demo(450000, {0, 700, 1920, 500}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Disturbance/assets/sample-image2.bmp");
     
+    // TODO: Option to move water sideways i.e. choosing a lissajous pattern 
+
     // bug in sample image1. not getting the h of the image.
-    Demo demo(100000, {0, 370, 622, 560}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Disturbance/assets/sample-image.bmp");
+    // bug segmentation fault if 300,000 on sample-image1.
+    Demo demo(100000, {0, 376, 622, 400}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image.bmp");
 
     if (!demo.is_init() ||
         !demo.create_window(set_default_vconfig()) ||
