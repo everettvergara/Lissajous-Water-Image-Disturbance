@@ -21,6 +21,7 @@ namespace g80 {
         Demo (const Dim N, const SDL_Rect &fly_rect, const std::string &bmp_file, const Dim TAIL = 2) : 
             N_(N),
             fly_rect_(fly_rect),
+            recalc_fly_rect_(fly_rect_),
             TAIL_(TAIL),
             BMP_(SDL_LoadBMP(bmp_file.c_str())) {
 
@@ -41,7 +42,7 @@ namespace g80 {
         const Dim N_;
         Dim FLY_RADIUS_{10};
         Dim MAX_FLY_INIT_ANGLE{20};
-        SDL_Rect fly_rect_;
+        SDL_Rect fly_rect_, recalc_fly_rect_;
         Dim TAIL_;
 
         Flies flies_;
@@ -108,50 +109,60 @@ namespace g80 {
 
     auto Demo::init_flies() -> bool {
         
-        // SDL_Surface *bmp = SDL_CreateRGBSurface(0, BMP_->w, BMP_->h, 32, 0, 0, 0, 0);
-        // SDL_BlitSurface(BMP_, NULL, bmp, NULL);
         SDL_Rect new_rect = get_fitted_rect(BMP_->w, BMP_->h, surface_->w * 0.90f, surface_->h * 0.90f);
         new_rect.x += surface_->w * 0.10f / 2.0f;
         new_rect.y += surface_->h * 0.10f / 2.0f;
-        std::cout << surface_->w << ", " << surface_->h << "\n";
-        std::cout << new_rect.x << ", " << new_rect.y << ": " << new_rect.w << " - " << new_rect.h << "\n";
         SDL_BlitScaled(BMP_, NULL, surface_, &new_rect);
 
+        float ar_w = 1.0f * BMP_->w / new_rect.w;
+        float ar_h = 1.0f * BMP_->h / new_rect.h;
+        
+        SDL_Rect new_fly_rect = fly_rect_;
+        new_fly_rect.x /= ar_w;
+        new_fly_rect.y /= ar_h;
+        new_fly_rect.w /= ar_w;
+        new_fly_rect.h /= ar_h;
+        
+        float sample_per_row = 2.0f * N_ / fly_rect_.h;         
+        float size_of_each_step = fly_rect_.w / sample_per_row;
+        
+        float x = new_fly_rect.x + new_rect.x;
+        float y = new_fly_rect.y + new_rect.y;
+        recalc_fly_rect_.w = new_fly_rect.w;
+        recalc_fly_rect_.h = new_fly_rect.h;        
+        recalc_fly_rect_.x = x;
+        recalc_fly_rect_.y = y;
+        
 
+        // std::cout << "surface.w: " << surface_->w << ", " << "surface.h: " << surface_->h << "\n";
+        // std::cout << "new_rect.x: " << new_rect.x << " new_rect.y: " << new_rect.y << "\n";
+        // std::cout << "ar: " << ar << " fly_rect.x: " << new_fly_rect.x << " fly_rect.y: " << new_fly_rect.y << " - " << new_fly_rect.w << " - " << new_fly_rect.h << "\n";
+        std::cout << BMP_->w << " - " << BMP_->h << "\n";
+        std::cout << "new_rect->x: " << new_rect.x << " new_rect->.y: " << new_rect.y << " - " << new_rect.w << " - " << new_rect.h << "\n";
+        std::cout << "recalc_fly_rect_.x: " << recalc_fly_rect_.x << " recalc_fly_rect_.y: " << recalc_fly_rect_.y << " - " << recalc_fly_rect_.w << " - " << recalc_fly_rect_.h << "\n";
 
-        // SDL_Rect center_rect {0, 0, };
-        // SDL_BlitSurface(BMP_, NULL, surface_, &center_rect);
-        // SDL_BlitSurface(BMP_, NULL, bmp, NULL);
-        //SDL_BlitSurface(BMP_, NULL, surface_, {surface_->w / 2 - bmp->w / 2, surface_->h / 2 - bmp->h / 2});
-        return true;
+        for (Dim i = 0; i < N_; ++i) {
 
-        // float sample_per_row = 2.0f * N_ / bmp->h;         
-        // float size_of_each_step = bmp->w / sample_per_row;
-        // float x = 0.0f, y = bmp->h / 2.0;
+            Uint32 *pixel = static_cast<Uint32 *>(surface_->pixels) + static_cast<Uint32>(y * surface_->w) + static_cast<Uint32>(x) + rnd() % static_cast<Uint32>(size_of_each_step);
+            Uint8 r, g, b;
+            SDL_GetRGB(*pixel, surface_->format, &r, &g, &b);
 
-        // for (Dim i = 0; i < N_; ++i) {
+            flies_.emplace_back(Fly{
+                static_cast<Dim>(x), 
+                static_cast<Dim>(y),
+                SDL_MapRGBA(surface_->format, r, g, b, 255),
+                SDL_MapRGBA(surface_->format, r / 1.25, g / 1.25, b / 1.25, 255),
+                static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
+                static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
+                static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
+                static_cast<Dim16>(1 + rnd() % FLY_RADIUS_)});
 
-        //     Uint32 *pixel = static_cast<Uint32 *>(bmp->pixels) + (int)(y * bmp->w) + (int)(x * size_of_each_step);
-        //     Uint8 r, g, b;
-        //     SDL_GetRGB(*pixel, bmp->format, &r, &g, &b);
-
-        //     flies_.emplace_back(Fly{
-        //         surface_->w / 2 - bmp->w / 2 + static_cast<Dim>(x * size_of_each_step), 
-        //         surface_->h / 2 - bmp->h / 2 + static_cast<Dim>(y),
-        //         SDL_MapRGBA(surface_->format, r, g, b, 255),
-        //         SDL_MapRGBA(surface_->format, r / 1.25, g / 1.25, b / 1.25, 255),
-        //         static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
-        //         static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
-        //         static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
-        //         static_cast<Dim16>(1 + rnd() % FLY_RADIUS_)});
-
-        //     if (++x >= sample_per_row) {
-        //         x = 0.0f;
-        //         ++y;
-        //     }
-        // }
-
-        // SDL_FreeSurface(bmp);
+            x += size_of_each_step;
+            if (x >= recalc_fly_rect_.x + new_rect.w) {
+                x = recalc_fly_rect_.x;
+                ++y;
+            }
+        }
 
         return true;
     }
@@ -182,23 +193,29 @@ namespace g80 {
 
         SDL_LockSurface(surface_);
 
-        // // Erase
-        // for (auto &fly : flies_) {
-        //     Dim x = fly.cx + fly.xr * cosf_[fly.xta];
-        //     Dim y = fly.cy + fly.yr * sinf_[fly.yta];
-        //     fly.xta = (fly.xta + fly.xan) % 360;
-        //     fly.yta = (fly.yta + fly.yan) % 360;
-        //     set_pixel(x, y, fly.e);
-        // }
+        // Erase
+        for (auto &fly : flies_) {
+            Dim x = fly.cx + fly.xr * cosf_[fly.xta];
+            Dim y = fly.cy + fly.yr * sinf_[fly.yta];
+            fly.xta = (fly.xta + fly.xan) % 360;
+            fly.yta = (fly.yta + fly.yan) % 360;
 
-        // // Update and Draw
-        // for (auto &fly : flies_) {
-        //     Dim x = fly.cx + fly.xr * cosf_[fly.xa];
-        //     Dim y = fly.cy + fly.yr * sinf_[fly.ya];
-        //     fly.xa = (fly.xa + fly.xan) % 360;
-        //     fly.ya = (fly.ya + fly.yan) % 360;
-        //     set_pixel(x, y, fly.c);
-        // }
+            if (x >= recalc_fly_rect_.x && x <= recalc_fly_rect_.x + recalc_fly_rect_.w &&
+                y >= recalc_fly_rect_.y && y <= recalc_fly_rect_.y + recalc_fly_rect_.h)
+                set_pixel(x, y, fly.e);
+        }
+
+        // Update and Draw
+        for (auto &fly : flies_) {
+            Dim x = fly.cx + fly.xr * cosf_[fly.xa];
+            Dim y = fly.cy + fly.yr * sinf_[fly.ya];
+            fly.xa = (fly.xa + fly.xan) % 360;
+            fly.ya = (fly.ya + fly.yan) % 360;
+
+            if (x >= recalc_fly_rect_.x && x <= recalc_fly_rect_.x + recalc_fly_rect_.w &&
+                y >= recalc_fly_rect_.y && y <= recalc_fly_rect_.y + recalc_fly_rect_.h)
+                set_pixel(x, y, fly.c);
+        }
         
         SDL_UnlockSurface(surface_);
         return true;
