@@ -18,8 +18,9 @@ namespace g80 {
     class Demo : public Video {
 
     public: 
-        Demo (const Dim N, const std::string &bmp_file, const Dim TAIL = 2) : 
+        Demo (const Dim N, const std::string &bmp_file, const SDL_Rect &fly_rect, const Dim TAIL = 2) : 
             N_(N),
+            fly_rect_(fly_rect),
             TAIL_(TAIL),
             BMP_(SDL_LoadBMP(bmp_file.c_str())) {
 
@@ -40,6 +41,7 @@ namespace g80 {
         const Dim N_;
         Dim FLY_RADIUS_{10};
         Dim MAX_FLY_INIT_ANGLE{20};
+        SDL_Rect fly_rect_;
         Dim TAIL_;
 
         Flies flies_;
@@ -86,14 +88,16 @@ namespace g80 {
     auto Demo::init_flies() -> bool {
         
         SDL_Surface *bmp = SDL_CreateRGBSurface(0, BMP_->w, BMP_->h, 32, 0, 0, 0, 0);
-        SDL_BlitSurface(BMP_, NULL, bmp, NULL );
-        // return true;
+        SDL_BlitSurface(BMP_, NULL, bmp, NULL);
+        //SDL_BlitSurface(BMP_, NULL, surface_, {surface_->w / 2 - bmp->w / 2, surface_->h / 2 - bmp->h / 2});
+        return true;
 
-        float sample_per_row = 1.0f * N_ / bmp->h;         
+        float sample_per_row = 2.0f * N_ / bmp->h;         
         float size_of_each_step = bmp->w / sample_per_row;
-        float x = 0.0f, y = 0.0f;
+        float x = 0.0f, y = bmp->h / 2.0;
 
         for (Dim i = 0; i < N_; ++i) {
+
             Uint32 *pixel = static_cast<Uint32 *>(bmp->pixels) + (int)(y * bmp->w) + (int)(x * size_of_each_step);
             Uint8 r, g, b;
             SDL_GetRGB(*pixel, bmp->format, &r, &g, &b);
