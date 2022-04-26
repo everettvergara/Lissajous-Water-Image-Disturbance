@@ -108,12 +108,14 @@ namespace g80 {
 
     auto Demo::init_flies() -> bool {
         
-        SDL_Surface *bmp = SDL_CreateRGBSurface(0, BMP_->w, BMP_->h, 32, 0, 0, 0, 0);
-        SDL_Rect new_rect = get_fitted_rect(bmp->w, bmp->h, surface_->w * 0.90f, surface_->h * 0.90f);
+        // SDL_Surface *bmp = SDL_CreateRGBSurface(0, BMP_->w, BMP_->h, 32, 0, 0, 0, 0);
+        // SDL_BlitSurface(BMP_, NULL, bmp, NULL);
+        SDL_Rect new_rect = get_fitted_rect(BMP_->w, BMP_->h, surface_->w * 0.90f, surface_->h * 0.90f);
         new_rect.x += surface_->w * 0.10f / 2.0f;
         new_rect.y += surface_->h * 0.10f / 2.0f;
+        std::cout << surface_->w << ", " << surface_->h << "\n";
         std::cout << new_rect.x << ", " << new_rect.y << ": " << new_rect.w << " - " << new_rect.h << "\n";
-        SDL_BlitSurface(bmp, NULL, surface_, &new_rect);
+        SDL_BlitScaled(BMP_, NULL, surface_, &new_rect);
 
 
 
@@ -123,33 +125,33 @@ namespace g80 {
         //SDL_BlitSurface(BMP_, NULL, surface_, {surface_->w / 2 - bmp->w / 2, surface_->h / 2 - bmp->h / 2});
         return true;
 
-        float sample_per_row = 2.0f * N_ / bmp->h;         
-        float size_of_each_step = bmp->w / sample_per_row;
-        float x = 0.0f, y = bmp->h / 2.0;
+        // float sample_per_row = 2.0f * N_ / bmp->h;         
+        // float size_of_each_step = bmp->w / sample_per_row;
+        // float x = 0.0f, y = bmp->h / 2.0;
 
-        for (Dim i = 0; i < N_; ++i) {
+        // for (Dim i = 0; i < N_; ++i) {
 
-            Uint32 *pixel = static_cast<Uint32 *>(bmp->pixels) + (int)(y * bmp->w) + (int)(x * size_of_each_step);
-            Uint8 r, g, b;
-            SDL_GetRGB(*pixel, bmp->format, &r, &g, &b);
+        //     Uint32 *pixel = static_cast<Uint32 *>(bmp->pixels) + (int)(y * bmp->w) + (int)(x * size_of_each_step);
+        //     Uint8 r, g, b;
+        //     SDL_GetRGB(*pixel, bmp->format, &r, &g, &b);
 
-            flies_.emplace_back(Fly{
-                surface_->w / 2 - bmp->w / 2 + static_cast<Dim>(x * size_of_each_step), 
-                surface_->h / 2 - bmp->h / 2 + static_cast<Dim>(y),
-                SDL_MapRGBA(surface_->format, r, g, b, 255),
-                SDL_MapRGBA(surface_->format, r / 1.25, g / 1.25, b / 1.25, 255),
-                static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
-                static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
-                static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
-                static_cast<Dim16>(1 + rnd() % FLY_RADIUS_)});
+        //     flies_.emplace_back(Fly{
+        //         surface_->w / 2 - bmp->w / 2 + static_cast<Dim>(x * size_of_each_step), 
+        //         surface_->h / 2 - bmp->h / 2 + static_cast<Dim>(y),
+        //         SDL_MapRGBA(surface_->format, r, g, b, 255),
+        //         SDL_MapRGBA(surface_->format, r / 1.25, g / 1.25, b / 1.25, 255),
+        //         static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
+        //         static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
+        //         static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
+        //         static_cast<Dim16>(1 + rnd() % FLY_RADIUS_)});
 
-            if (++x >= sample_per_row) {
-                x = 0.0f;
-                ++y;
-            }
-        }
+        //     if (++x >= sample_per_row) {
+        //         x = 0.0f;
+        //         ++y;
+        //     }
+        // }
 
-        SDL_FreeSurface(bmp);
+        // SDL_FreeSurface(bmp);
 
         return true;
     }

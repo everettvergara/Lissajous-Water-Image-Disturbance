@@ -14,9 +14,8 @@ auto main(int argc, char *argv[]) -> int {
 
     if (!demo.is_init() ||
         !demo.create_window(set_default_vconfig()) ||
-        !demo.preprocess_states() //||
-        // !demo.run()
-        ) { 
+        !demo.preprocess_states() ||
+        !demo.run()) { 
 
         SDL_Log("Error... whatever!");
         return -1;
