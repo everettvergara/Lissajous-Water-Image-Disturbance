@@ -14,8 +14,9 @@ auto main(int argc, char *argv[]) -> int {
 
     if (!demo.is_init() ||
         !demo.create_window(set_default_vconfig()) ||
-        !demo.preprocess_states() ||
-        !demo.run()) { 
+        !demo.preprocess_states() //||
+        // !demo.run()
+        ) { 
 
         SDL_Log("Error... whatever!");
         return -1;
@@ -31,7 +32,7 @@ auto set_default_vconfig() -> VideoConfig {
         {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720},
         // {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080},
         // {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 2560, 1600},
-        SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN,
+        SDL_WINDOW_SHOWN,
         60
     }; 
     return vconfig;

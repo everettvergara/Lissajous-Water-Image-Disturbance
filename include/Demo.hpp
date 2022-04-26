@@ -18,7 +18,7 @@ namespace g80 {
     class Demo : public Video {
 
     public: 
-        Demo (const Dim N, const std::string &bmp_file, const SDL_Rect &fly_rect, const Dim TAIL = 2) : 
+        Demo (const Dim N, const SDL_Rect &fly_rect, const std::string &bmp_file, const Dim TAIL = 2) : 
             N_(N),
             fly_rect_(fly_rect),
             TAIL_(TAIL),
@@ -59,7 +59,7 @@ namespace g80 {
             return rand = (rand * a + c) % m; 
         }
 
-        auto get_fitted_rect(int w_from, int h_from, int w_to, int h_to) -> SDL_Rect {
+        auto get_fitted_rect(int w_from, int h_from, int w_to, int h_to) -> SDL_Rect;
         auto init_sincos_table() -> bool;
         auto init_reserved_flies() -> bool;
         auto init_flies() -> bool;
@@ -93,17 +93,28 @@ namespace g80 {
             return {w_to / 2 - w_from / 2, h_to / 2 - h_from / 2, w_from, h_to};
         
         int w = w_from, h = h_from;
-        if (w > w_to) {float ar = w / w_to; w /= ar; h /= ar;}
-        if (h > h_to) {float ar = h / h_to; w /= ar; h /= ar;}
-        return {w_to / 2 - w_from / 2, h_to / 2 - h_from / 2, w, h};
+        if (w > w_to) {
+            float ar = 1.0f * w / w_to; 
+            w /= ar; 
+            h /= ar;
+        }
+        if (h > h_to) {
+            float ar = 1.0f * h / h_to; 
+            w /= ar; 
+            h /= ar;
+        }
+        return {w_to / 2 - w / 2, h_to / 2 - h / 2, w, h};
     }
 
     auto Demo::init_flies() -> bool {
         
         SDL_Surface *bmp = SDL_CreateRGBSurface(0, BMP_->w, BMP_->h, 32, 0, 0, 0, 0);
-        SDL_Rect fitted_rect = get_fitted_rect({0, 0, bmp->w, bmp->h}, {0, 0, static_cast<int>(surface_->w * 0.90f), static_cast<int>(surface_->h * 0.90f)})
+        SDL_Rect new_rect = get_fitted_rect(bmp->w, bmp->h, surface_->w * 0.90f, surface_->h * 0.90f);
+        new_rect.x += surface_->w * 0.10f / 2.0f;
+        new_rect.y += surface_->h * 0.10f / 2.0f;
+        std::cout << new_rect.x << ", " << new_rect.y << ": " << new_rect.w << " - " << new_rect.h << "\n";
+        SDL_BlitSurface(bmp, NULL, surface_, &new_rect);
 
-        
 
 
         // SDL_Rect center_rect {0, 0, };
@@ -169,23 +180,23 @@ namespace g80 {
 
         SDL_LockSurface(surface_);
 
-        // Erase
-        for (auto &fly : flies_) {
-            Dim x = fly.cx + fly.xr * cosf_[fly.xta];
-            Dim y = fly.cy + fly.yr * sinf_[fly.yta];
-            fly.xta = (fly.xta + fly.xan) % 360;
-            fly.yta = (fly.yta + fly.yan) % 360;
-            set_pixel(x, y, fly.e);
-        }
+        // // Erase
+        // for (auto &fly : flies_) {
+        //     Dim x = fly.cx + fly.xr * cosf_[fly.xta];
+        //     Dim y = fly.cy + fly.yr * sinf_[fly.yta];
+        //     fly.xta = (fly.xta + fly.xan) % 360;
+        //     fly.yta = (fly.yta + fly.yan) % 360;
+        //     set_pixel(x, y, fly.e);
+        // }
 
-        // Update and Draw
-        for (auto &fly : flies_) {
-            Dim x = fly.cx + fly.xr * cosf_[fly.xa];
-            Dim y = fly.cy + fly.yr * sinf_[fly.ya];
-            fly.xa = (fly.xa + fly.xan) % 360;
-            fly.ya = (fly.ya + fly.yan) % 360;
-            set_pixel(x, y, fly.c);
-        }
+        // // Update and Draw
+        // for (auto &fly : flies_) {
+        //     Dim x = fly.cx + fly.xr * cosf_[fly.xa];
+        //     Dim y = fly.cy + fly.yr * sinf_[fly.ya];
+        //     fly.xa = (fly.xa + fly.xan) % 360;
+        //     fly.ya = (fly.ya + fly.yan) % 360;
+        //     set_pixel(x, y, fly.c);
+        // }
         
         SDL_UnlockSurface(surface_);
         return true;
