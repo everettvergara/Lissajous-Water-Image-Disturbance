@@ -18,8 +18,7 @@ namespace g80 {
     class Demo : public Video {
 
     public: 
-        Demo (const Dim &N, const SDL_Rect &fly_rect, const std::string &bmp_file, const Dim &TAIL = 2) : 
-            N_(N),
+        Demo (const SDL_Rect &fly_rect, const std::string &bmp_file, const Dim &TAIL = 2) : 
             fly_area_(fly_rect),
             recalc_fly_area_(fly_area_),
             TAIL_(TAIL),
@@ -39,7 +38,7 @@ namespace g80 {
         auto capture_events() -> bool;
 
     private:
-        const Dim N_;
+        Dim N_;
         Dim FLY_RADIUS_{10};
         Dim MAX_FLY_INIT_ANGLE{20};
         SDL_Rect fly_area_, recalc_fly_area_;
@@ -83,11 +82,6 @@ namespace g80 {
         return true;
     }
 
-    auto Demo::init_reserved_flies() -> bool {
-        flies_.reserve(N_);
-        return true;
-    }
-
     auto Demo::get_fitted_rect(int w_from, int h_from, int w_to, int h_to) -> SDL_Rect {
 
         if (w_from <= w_to && h_from <= h_to)
@@ -126,56 +120,38 @@ namespace g80 {
         resized_fly_area.y /= ar_h;
         resized_fly_area.w /= ar_w;
         resized_fly_area.h /= ar_h;
+        
         float x = resized_fly_area.x + resized_bmp_rect.x;
         float y = resized_fly_area.y + resized_bmp_rect.y;
-        recalc_fly_area_.x = x;
-        recalc_fly_area_.y = y;
+        recalc_fly_area_.x = static_cast<Dim32>(x);
+        recalc_fly_area_.y = static_cast<Dim32>(y);
         recalc_fly_area_.w = resized_fly_area.w;
         recalc_fly_area_.h = resized_fly_area.h;        
-
-        std::cout << BMP_->w << " - " << BMP_->h << "\n";
-        std::cout << "resized_bmp_rect->x: " << resized_bmp_rect.x << " y: " << resized_bmp_rect.y << " - " << resized_bmp_rect.w << " - " << resized_bmp_rect.h << "\n";
-        std::cout << "resized_fly_area.x: " << resized_fly_area.x << " y: " << resized_fly_area.y << " - " << resized_fly_area.w << " - " << resized_fly_area.h << "\n";
-        std::cout << "recalc_fly_area_.x: " << recalc_fly_area_.x << " y: " << recalc_fly_area_.y << " - " << recalc_fly_area_.w << " - " << recalc_fly_area_.h << "\n";
-
+        
+        
         float sample_per_row = N_ / recalc_fly_area_.h;         
-        float size_of_each_step = recalc_fly_area_.w / sample_per_row;
+        float size_of_each_stepf = recalc_fly_area_.w / sample_per_row;
+        Dim32 size_of_each_stepi = static_cast<Dim32>(size_of_each_stepf) == 0 ? 1 : static_cast<Dim32>(size_of_each_stepf);
+        N_ = resized_fly_area.w * resized_fly_area.h;
+        flies_.reserve(N_);
 
         for (Dim i = 0; i < N_; ++i) {
-            Uint32 i_size_of_each_step = !static_cast<Uint32>(size_of_each_step) ? 1 : static_cast<Uint32>(size_of_each_step);
-            Uint32 *pixel = static_cast<Uint32 *>(surface_->pixels) + static_cast<Uint32>(y * surface_->w) + static_cast<Uint32>(x) + rnd() % static_cast<Uint32>(i_size_of_each_step);
-            // if(pixel >= static_cast<Uint32 *>(surface_->pixels) + surface_->h * surface_->w) {
-            //     std::cout << "w: " << surface_->w << "\n";
-            //     std::cout << "h: " << surface_->h << "\n";
-            //     std::cout << "w*h: " << surface_->h * surface_->w << "\n";
-                
-            //     std::cout << "x: " << x << "\n";
-            //     std::cout << "y: " << y << "\n";
-            //     std::cout << "s: " << s << "\n";
-            //     std::cout << "px: " << (static_cast<Uint32>(y * surface_->w) + static_cast<Uint32>(x) + rnd() % s) << "\n";
-            //     std::cout << "px1: " << (static_cast<Uint32>(y * surface_->w)) << "\n";
-            //     std::cout << "px2: " << static_cast<Uint32>(x) << "\n";
-            //     std::cout << "px3: " <<  rnd() % s << "\n";
-                
-            //     exit(0);
-            // }
             
-            
-            
+            Dim32 *pixel = static_cast<Dim32 *>(surface_->pixels) + static_cast<Dim32>(y * surface_->w) + static_cast<Dim32>(x) + rnd() % static_cast<Dim32>(size_of_each_stepi);
             Uint8 r, g, b;
             SDL_GetRGB(*pixel, surface_->format, &r, &g, &b);
 
             flies_.emplace_back(Fly{
-                static_cast<Dim>(x), 
-                static_cast<Dim>(y),
+                static_cast<Dim32>(x), 
+                static_cast<Dim32>(y),
                 SDL_MapRGBA(surface_->format, r, g, b, 255),
-                SDL_MapRGBA(surface_->format, r / 1.25, g / 1.25, b / 1.25, 255),
+                SDL_MapRGBA(surface_->format, r / 1.25f, g / 1.25f, b / 1.25f, 255),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
                 static_cast<Dim16>(1 + rnd() % FLY_RADIUS_)});
 
-            x += size_of_each_step;
+            x += size_of_each_stepf;
             if (x >= recalc_fly_area_.x + resized_bmp_rect.w) {
                 x = recalc_fly_area_.x;
                 ++y;
@@ -198,7 +174,6 @@ namespace g80 {
 
     auto Demo::preprocess_states() -> bool {
         if (!init_sincos_table() ||
-            !init_reserved_flies() ||
             !init_flies() ||
             !init_fly_tail())
             return false;

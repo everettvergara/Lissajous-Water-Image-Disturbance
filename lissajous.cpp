@@ -10,14 +10,15 @@ auto set_default_vconfig() -> VideoConfig;
 auto main(int argc, char *argv[]) -> int {
 
     VideoConfig vconfig {set_default_vconfig()};
+    
     // The bounds of the lissajous flies must not be beyond the dim of the image
-    Demo demo(800000, {0, 700, 1920, 500}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image2.bmp");
+    Demo demo({0, 700, 1920, 500}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image2.bmp");
     
 
     // TODO: Option to move water sideways i.e. choosing a lissajous pattern 
+    // TODO: N_ should not exceed resized_fly_area.w * resized_fly_area.h
     // TODO: Fly radius, N_ should be automatic based fly_rect
 
-    // bug segmentation fault if 300,000 on sample-image1.
     // Demo demo(100000, {0, 376, 622, 400}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image.bmp");
 
     if (!demo.is_init() ||
