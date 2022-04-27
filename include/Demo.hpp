@@ -138,8 +138,8 @@ namespace g80 {
         std::cout << "resized_fly_area.x: " << resized_fly_area.x << " y: " << resized_fly_area.y << " - " << resized_fly_area.w << " - " << resized_fly_area.h << "\n";
         std::cout << "recalc_fly_area_.x: " << recalc_fly_area_.x << " y: " << recalc_fly_area_.y << " - " << recalc_fly_area_.w << " - " << recalc_fly_area_.h << "\n";
 
-        float sample_per_row = 2.0f * N_ / fly_area_.h;         
-        float size_of_each_step = fly_area_.w / sample_per_row;
+        float sample_per_row = N_ / recalc_fly_area_.h;         
+        float size_of_each_step = recalc_fly_area_.w / sample_per_row;
 
         for (Dim i = 0; i < N_; ++i) {
 
@@ -163,7 +163,6 @@ namespace g80 {
                 ++y;
             }
         }
-
         return true;
     }
 
