@@ -7,7 +7,6 @@ auto set_default_vconfig() -> VideoConfig;
 auto main(int argc, char *argv[]) -> int {
 
     VideoConfig vconfig {set_default_vconfig()};
-
     Demo demo("/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image2.bmp", {0, 700, 1920, 500});
     // Demo demo("/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image.bmp", {0, 376, 622, 400});
     

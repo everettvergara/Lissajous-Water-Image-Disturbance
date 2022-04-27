@@ -67,7 +67,7 @@ namespace g80 {
             return rand = (rand * a + c) % m; 
         }
 
-        auto get_fitted_rect(int w_from, int h_from, int w_to, int h_to) -> SDL_Rect;
+        auto get_fitted_rect(Dim32 w_from, Dim32 h_from, Dim32 w_to, Dim32 h_to, Dim32 x_off, Dim32 y_off) -> SDL_Rect;
         auto init_sincos_table() -> bool;
         auto init_reserved_flies() -> bool;
         auto init_flies() -> bool;
@@ -90,12 +90,12 @@ namespace g80 {
         return true;
     }
 
-    auto Demo::get_fitted_rect(int w_from, int h_from, int w_to, int h_to) -> SDL_Rect {
+    auto Demo::get_fitted_rect(Dim32 w_from, Dim32 h_from, Dim32 w_to, Dim32 h_to, Dim32 x_off, Dim32 y_off) -> SDL_Rect {
 
         if (w_from <= w_to && h_from <= h_to)
             return {w_to / 2 - w_from / 2, h_to / 2 - h_from / 2, w_from, h_to};
         
-        int w = w_from, h = h_from;
+        Dim32 w = w_from, h = h_from;
         
         if (w > w_to) {
             float rr = 1.0f * w / w_to; 
@@ -109,21 +109,17 @@ namespace g80 {
             h /= rr; 
         }
 
-        return {w_to / 2 - w / 2, h_to / 2 - h / 2, w, h};
+        return {x_off + w_to / 2 - w / 2, y_off + h_to / 2 - h / 2, w, h};
     }
 
     auto Demo::init_flies() -> bool {
         
-        SDL_Rect resized_bmp_rect = get_fitted_rect(BMP_->w, BMP_->h, surface_->w * 0.90f, surface_->h * 0.90f);
-        resized_bmp_rect.x += surface_->w * 0.10f / 2.0f;
-        resized_bmp_rect.y += surface_->h * 0.10f / 2.0f;
+        SDL_Rect resized_fly_area = fly_area_;
+        SDL_Rect resized_bmp_rect = get_fitted_rect(BMP_->w, BMP_->h, surface_->w * 0.90f, surface_->h * 0.90f, surface_->w * 0.10f / 2.0f, surface_->h * 0.10f / 2.0f);
         SDL_BlitScaled(BMP_, NULL, surface_, &resized_bmp_rect);
 
-        // float ar = 1.0f * BMP_->w / BMP_->h;
         float ar_w = 1.0f * BMP_->w / resized_bmp_rect.w;
         float ar_h = 1.0f * BMP_->h / resized_bmp_rect.h;
-        
-        SDL_Rect resized_fly_area = fly_area_;
         resized_fly_area.x /= ar_w;
         resized_fly_area.y /= ar_h;
         resized_fly_area.w /= ar_w;
