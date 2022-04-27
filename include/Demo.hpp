@@ -114,25 +114,21 @@ namespace g80 {
 
     auto Demo::init_flies() -> bool {
         
-        SDL_Rect resized_fly_area = fly_area_;
         SDL_Rect resized_bmp_rect = get_fitted_rect(BMP_->w, BMP_->h, surface_->w * 0.90f, surface_->h * 0.90f, surface_->w * 0.10f / 2.0f, surface_->h * 0.10f / 2.0f);
         SDL_BlitScaled(BMP_, NULL, surface_, &resized_bmp_rect);
 
         float ar_w = 1.0f * BMP_->w / resized_bmp_rect.w;
         float ar_h = 1.0f * BMP_->h / resized_bmp_rect.h;
-        resized_fly_area.x /= ar_w;
-        resized_fly_area.y /= ar_h;
-        resized_fly_area.w /= ar_w;
-        resized_fly_area.h /= ar_h;
+        recalc_fly_area_ = fly_area_;
+        recalc_fly_area_.x = recalc_fly_area_.x / ar_w + resized_bmp_rect.x;
+        recalc_fly_area_.y = recalc_fly_area_.y / ar_h + resized_bmp_rect.y;
+        recalc_fly_area_.w /= ar_w;
+        recalc_fly_area_.h /= ar_h;
         
-        float x = resized_fly_area.x + resized_bmp_rect.x;
-        float y = resized_fly_area.y + resized_bmp_rect.y;
-        recalc_fly_area_.x = static_cast<Dim32>(x);
-        recalc_fly_area_.y = static_cast<Dim32>(y);
-        recalc_fly_area_.w = resized_fly_area.w;
-        recalc_fly_area_.h = resized_fly_area.h;        
+        float x = recalc_fly_area_.x;
+        float y = recalc_fly_area_.y;    
         
-        N_ = resized_fly_area.w * resized_fly_area.h;
+        N_ = recalc_fly_area_.w * recalc_fly_area_.h;
         float sample_per_row = N_ / recalc_fly_area_.h;         
         float size_of_each_stepf = recalc_fly_area_.w / sample_per_row;
         Dim32 size_of_each_stepi = static_cast<Dim32>(size_of_each_stepf) == 0 ? 1 : static_cast<Dim32>(size_of_each_stepf);
