@@ -10,17 +10,15 @@ auto set_default_vconfig() -> VideoConfig;
 auto main(int argc, char *argv[]) -> int {
 
     VideoConfig vconfig {set_default_vconfig()};
+
+    Demo demo(
+        "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image2.bmp",
+        {0, 700, 1920, 500});
     
-    // The bounds of the lissajous flies must not be beyond the dim of the image
-    Demo demo({0, 700, 1920, 500}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image2.bmp");
+    // Demo demo(
+    //     "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image.bmp",
+    //     {0, 376, 622, 400});
     
-
-    // TODO: Option to move water sideways i.e. choosing a lissajous pattern 
-    // TODO: N_ should not exceed resized_fly_area.w * resized_fly_area.h
-    // TODO: Fly radius, N_ should be automatic based fly_rect
-
-    // Demo demo(100000, {0, 376, 622, 400}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image.bmp");
-
     if (!demo.is_init() ||
         !demo.create_window(set_default_vconfig()) ||
         !demo.preprocess_states() ||
@@ -37,10 +35,10 @@ auto set_default_vconfig() -> VideoConfig {
     VideoConfig vconfig {
         "Water effect - Image Disturbance",
         // {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600},
-        {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720},
+        // {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720},
         // {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080},
-        // {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 2560, 1600},
-        SDL_WINDOW_SHOWN,
+        {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 2560, 1600},
+        SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN_DESKTOP,
         60
     }; 
     return vconfig;

@@ -18,10 +18,17 @@ namespace g80 {
     class Demo : public Video {
 
     public: 
-        Demo (const SDL_Rect &fly_rect, const std::string &bmp_file, const Dim &TAIL = 2) : 
+        Demo (
+            const std::string &bmp_file, 
+            const SDL_Rect &fly_rect, 
+            const Dim &TAIL = 2, 
+            const Dim &FLY_RADIUS_X = 10,
+            const Dim &FLY_RADIUS_Y = 5) : 
             fly_area_(fly_rect),
             recalc_fly_area_(fly_area_),
             TAIL_(TAIL),
+            FLY_RADIUS_X_(FLY_RADIUS_X),
+            FLY_RADIUS_Y_(FLY_RADIUS_Y),
             BMP_(SDL_LoadBMP(bmp_file.c_str())) {
 
             if (!BMP_) {
@@ -39,7 +46,8 @@ namespace g80 {
 
     private:
         Dim N_;
-        Dim FLY_RADIUS_{10};
+        Dim FLY_RADIUS_X_;
+        Dim FLY_RADIUS_Y_;
         Dim MAX_FLY_INIT_ANGLE{20};
         SDL_Rect fly_area_, recalc_fly_area_;
         Dim TAIL_;
@@ -128,16 +136,15 @@ namespace g80 {
         recalc_fly_area_.w = resized_fly_area.w;
         recalc_fly_area_.h = resized_fly_area.h;        
         
-        
+        N_ = resized_fly_area.w * resized_fly_area.h;
         float sample_per_row = N_ / recalc_fly_area_.h;         
         float size_of_each_stepf = recalc_fly_area_.w / sample_per_row;
         Dim32 size_of_each_stepi = static_cast<Dim32>(size_of_each_stepf) == 0 ? 1 : static_cast<Dim32>(size_of_each_stepf);
-        N_ = resized_fly_area.w * resized_fly_area.h;
+        
         flies_.reserve(N_);
-
         for (Dim i = 0; i < N_; ++i) {
             
-            Dim32 *pixel = static_cast<Dim32 *>(surface_->pixels) + static_cast<Dim32>(y * surface_->w) + static_cast<Dim32>(x) + rnd() % static_cast<Dim32>(size_of_each_stepi);
+            Dim32 *pixel = static_cast<Dim32 *>(surface_->pixels) + static_cast<Dim32>(y * surface_->w) + static_cast<Dim32>(x) + rnd() % size_of_each_stepi;
             Uint8 r, g, b;
             SDL_GetRGB(*pixel, surface_->format, &r, &g, &b);
 
@@ -148,8 +155,8 @@ namespace g80 {
                 SDL_MapRGBA(surface_->format, r / 1.25f, g / 1.25f, b / 1.25f, 255),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
                 static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
-                static_cast<Dim16>(1 + rnd() % FLY_RADIUS_),
-                static_cast<Dim16>(1 + rnd() % FLY_RADIUS_)});
+                static_cast<Dim16>(1 + rnd() % FLY_RADIUS_X_),
+                static_cast<Dim16>(1 + rnd() % FLY_RADIUS_Y_)});
 
             x += size_of_each_stepf;
             if (x >= recalc_fly_area_.x + resized_bmp_rect.w) {
