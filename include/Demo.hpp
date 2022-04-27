@@ -5,7 +5,6 @@
 #include <ctime>
 #include <cmath>
 #include <array>
-#include <vector>
 #include <cassert>
 
 #include "Commons.hpp"
@@ -21,14 +20,13 @@ namespace g80 {
         Demo (
             const std::string &bmp_file, 
             const SDL_Rect &fly_rect, 
-            const Dim &TAIL = 2, 
-            const Dim &FLY_RADIUS_X = 10,
-            const Dim &FLY_RADIUS_Y = 5) : 
+            const Dim &tail = 2, 
+            const Dim &fly_radius_x = 10,
+            const Dim &fly_radius_y = 5) : 
             fly_area_(fly_rect),
-            recalc_fly_area_(fly_area_),
-            TAIL_(TAIL),
-            FLY_RADIUS_X_(FLY_RADIUS_X),
-            FLY_RADIUS_Y_(FLY_RADIUS_Y),
+            tail_(tail),
+            fly_radius_x_(fly_radius_x),
+            fly_radius_y_(fly_radius_y),
             BMP_(SDL_LoadBMP(bmp_file.c_str())) {
 
             if (!BMP_) {
@@ -46,11 +44,13 @@ namespace g80 {
 
     private:
         Dim N_;
-        Dim FLY_RADIUS_X_;
-        Dim FLY_RADIUS_Y_;
-        Dim MAX_FLY_INIT_ANGLE{20};
-        SDL_Rect fly_area_, recalc_fly_area_;
-        Dim TAIL_;
+        SDL_Rect fly_area_;
+        Dim tail_;
+        Dim fly_radius_x_;
+        Dim fly_radius_y_;
+        Dim max_fly_init_angle_{20};
+        SDL_Rect recalc_fly_area_;
+
 
         Flies flies_;
         std::array<float, 360> cosf_;
@@ -153,10 +153,10 @@ namespace g80 {
                 static_cast<Dim32>(y),
                 SDL_MapRGBA(surface_->format, r, g, b, 255),
                 SDL_MapRGBA(surface_->format, r / 1.25f, g / 1.25f, b / 1.25f, 255),
-                static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
-                static_cast<Dim16>(1 + rnd() % MAX_FLY_INIT_ANGLE),
-                static_cast<Dim16>(1 + rnd() % FLY_RADIUS_X_),
-                static_cast<Dim16>(1 + rnd() % FLY_RADIUS_Y_)});
+                static_cast<Dim16>(1 + rnd() % max_fly_init_angle_),
+                static_cast<Dim16>(1 + rnd() % max_fly_init_angle_),
+                static_cast<Dim16>(1 + rnd() % fly_radius_x_),
+                static_cast<Dim16>(1 + rnd() % fly_radius_y_)});
 
             x += size_of_each_stepf;
             if (x >= recalc_fly_area_.x + resized_bmp_rect.w) {
@@ -169,12 +169,12 @@ namespace g80 {
 
     auto Demo::init_fly_tail() -> bool {
         for (auto &fly : flies_) {
-            Dim max_offset_x = (360 / fly.xan) - TAIL_;
-            Dim max_offset_y = (360 / fly.yan) - TAIL_;
-            fly.xa = (rnd() % max_offset_x * fly.xan) + TAIL_ * fly.xan;
-            fly.ya = (rnd() % max_offset_y * fly.yan) + TAIL_ * fly.yan;
-            fly.xta = fly.xa - TAIL_ * fly.xan;
-            fly.yta = fly.ya - TAIL_ * fly.yan;        
+            Dim max_offset_x = (360 / fly.xan) - tail_;
+            Dim max_offset_y = (360 / fly.yan) - tail_;
+            fly.xa = (rnd() % max_offset_x * fly.xan) + tail_ * fly.xan;
+            fly.ya = (rnd() % max_offset_y * fly.yan) + tail_ * fly.yan;
+            fly.xta = fly.xa - tail_ * fly.xan;
+            fly.yta = fly.ya - tail_ * fly.yan;        
         }
         return true;
     }

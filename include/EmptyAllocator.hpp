@@ -5,7 +5,6 @@ namespace g80 {
     template<typename T>
     class EmptyAllocator : public std::allocator<T> {
     public:
-
         // todo: allow empty alloc to acccept Variadic Args
         auto allocate(size_t n) -> T * {
             auto p = new T[n];
