@@ -53,8 +53,8 @@ namespace g80 {
             return static_cast<Uint32 *>(surface_->pixels) + surface_->w * y + x;
         }
 
-        inline auto set_pixel(Uint32 x, Uint32 y, Uint32 color) -> void {
-            Uint32 *pixel = pixel_buffer(x, y);
+        inline auto set_pixel(Sint32 x, Sint32 y, Uint32 color) -> void {
+            Uint32 *pixel = pixel_buffer(static_cast<Uint32>(x), static_cast<Uint32>(y));
             if (pixel >= static_cast<Uint32 *>(surface_->pixels) && pixel < pixel_end_)
                 *pixel = color;
         }

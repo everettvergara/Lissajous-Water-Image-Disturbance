@@ -20,9 +20,9 @@ namespace g80 {
         Demo (
             const std::string &bmp_file, 
             const SDL_Rect &fly_rect, 
-            const Dim &tail = 2, 
-            const Dim &fly_radius_x = 10,
-            const Dim &fly_radius_y = 5) : 
+            const Dim32 &tail = 2, 
+            const Dim32 &fly_radius_x = 10,
+            const Dim32 &fly_radius_y = 5) : 
             fly_area_(fly_rect),
             tail_(tail),
             fly_radius_x_(fly_radius_x),
@@ -43,12 +43,12 @@ namespace g80 {
         auto capture_events() -> bool;
 
     private:
-        Dim N_;
+        Dim32 N_;
         SDL_Rect fly_area_;
-        Dim tail_;
-        Dim fly_radius_x_;
-        Dim fly_radius_y_;
-        Dim max_fly_init_angle_{20};
+        Dim32 tail_;
+        Dim32 fly_radius_x_;
+        Dim32 fly_radius_y_;
+        Dim32 max_fly_init_angle_{20};
         SDL_Rect recalc_fly_area_;
 
 
@@ -142,7 +142,7 @@ namespace g80 {
         Dim32 size_of_each_stepi = static_cast<Dim32>(size_of_each_stepf) == 0 ? 1 : static_cast<Dim32>(size_of_each_stepf);
         
         flies_.reserve(N_);
-        for (Dim i = 0; i < N_; ++i) {
+        for (Dim32 i = 0; i < N_; ++i) {
             
             Dim32 *pixel = static_cast<Dim32 *>(surface_->pixels) + static_cast<Dim32>(y * surface_->w) + static_cast<Dim32>(x) + rnd() % size_of_each_stepi;
             Uint8 r, g, b;
@@ -169,8 +169,8 @@ namespace g80 {
 
     auto Demo::init_fly_tail() -> bool {
         for (auto &fly : flies_) {
-            Dim max_offset_x = (360 / fly.xan) - tail_;
-            Dim max_offset_y = (360 / fly.yan) - tail_;
+            Dim32 max_offset_x = (360 / fly.xan) - tail_;
+            Dim32 max_offset_y = (360 / fly.yan) - tail_;
             fly.xa = (rnd() % max_offset_x * fly.xan) + tail_ * fly.xan;
             fly.ya = (rnd() % max_offset_y * fly.yan) + tail_ * fly.yan;
             fly.xta = fly.xa - tail_ * fly.xan;
@@ -194,11 +194,10 @@ namespace g80 {
 
         // Erase
         for (auto &fly : flies_) {
-            Dim x = fly.cx + fly.xr * cosf_[fly.xta];
-            Dim y = fly.cy + fly.yr * sinf_[fly.yta];
+            Dim32 x = fly.cx + fly.xr * cosf_[fly.xta];
+            Dim32 y = fly.cy + fly.yr * sinf_[fly.yta];
             fly.xta = (fly.xta + fly.xan) % 360;
             fly.yta = (fly.yta + fly.yan) % 360;
-
             if (x >= recalc_fly_area_.x && x <= recalc_fly_area_.x + recalc_fly_area_.w &&
                 y >= recalc_fly_area_.y && y <= recalc_fly_area_.y + recalc_fly_area_.h)
                 set_pixel(x, y, fly.e);
@@ -206,16 +205,14 @@ namespace g80 {
 
         // Update and Draw
         for (auto &fly : flies_) {
-            Dim x = fly.cx + fly.xr * cosf_[fly.xa];
-            Dim y = fly.cy + fly.yr * sinf_[fly.ya];
+            Dim32 x = fly.cx + fly.xr * cosf_[fly.xa];
+            Dim32 y = fly.cy + fly.yr * sinf_[fly.ya];
             fly.xa = (fly.xa + fly.xan) % 360;
             fly.ya = (fly.ya + fly.yan) % 360;
-
             if (x >= recalc_fly_area_.x && x <= recalc_fly_area_.x + recalc_fly_area_.w &&
                 y >= recalc_fly_area_.y && y <= recalc_fly_area_.y + recalc_fly_area_.h)
                 set_pixel(x, y, fly.c);
         }
-        
         SDL_UnlockSurface(surface_);
         return true;
     }
