@@ -142,8 +142,26 @@ namespace g80 {
         float size_of_each_step = recalc_fly_area_.w / sample_per_row;
 
         for (Dim i = 0; i < N_; ++i) {
-
-            Uint32 *pixel = static_cast<Uint32 *>(surface_->pixels) + static_cast<Uint32>(y * surface_->w) + static_cast<Uint32>(x) + rnd() % static_cast<Uint32>(size_of_each_step);
+            Uint32 i_size_of_each_step = !static_cast<Uint32>(size_of_each_step) ? 1 : static_cast<Uint32>(size_of_each_step);
+            Uint32 *pixel = static_cast<Uint32 *>(surface_->pixels) + static_cast<Uint32>(y * surface_->w) + static_cast<Uint32>(x) + rnd() % static_cast<Uint32>(i_size_of_each_step);
+            // if(pixel >= static_cast<Uint32 *>(surface_->pixels) + surface_->h * surface_->w) {
+            //     std::cout << "w: " << surface_->w << "\n";
+            //     std::cout << "h: " << surface_->h << "\n";
+            //     std::cout << "w*h: " << surface_->h * surface_->w << "\n";
+                
+            //     std::cout << "x: " << x << "\n";
+            //     std::cout << "y: " << y << "\n";
+            //     std::cout << "s: " << s << "\n";
+            //     std::cout << "px: " << (static_cast<Uint32>(y * surface_->w) + static_cast<Uint32>(x) + rnd() % s) << "\n";
+            //     std::cout << "px1: " << (static_cast<Uint32>(y * surface_->w)) << "\n";
+            //     std::cout << "px2: " << static_cast<Uint32>(x) << "\n";
+            //     std::cout << "px3: " <<  rnd() % s << "\n";
+                
+            //     exit(0);
+            // }
+            
+            
+            
             Uint8 r, g, b;
             SDL_GetRGB(*pixel, surface_->format, &r, &g, &b);
 
