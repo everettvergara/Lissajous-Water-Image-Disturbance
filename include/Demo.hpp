@@ -18,10 +18,10 @@ namespace g80 {
     class Demo : public Video {
 
     public: 
-        Demo (const Dim N, const SDL_Rect &fly_rect, const std::string &bmp_file, const Dim TAIL = 2) : 
+        Demo (const Dim &N, const SDL_Rect &fly_rect, const std::string &bmp_file, const Dim &TAIL = 2) : 
             N_(N),
-            fly_rect_(fly_rect),
-            recalc_fly_rect_(fly_rect_),
+            fly_area_(fly_rect),
+            recalc_fly_area_(fly_area_),
             TAIL_(TAIL),
             BMP_(SDL_LoadBMP(bmp_file.c_str())) {
 
@@ -42,7 +42,7 @@ namespace g80 {
         const Dim N_;
         Dim FLY_RADIUS_{10};
         Dim MAX_FLY_INIT_ANGLE{20};
-        SDL_Rect fly_rect_, recalc_fly_rect_;
+        SDL_Rect fly_area_, recalc_fly_area_;
         Dim TAIL_;
 
         Flies flies_;
@@ -94,52 +94,52 @@ namespace g80 {
             return {w_to / 2 - w_from / 2, h_to / 2 - h_from / 2, w_from, h_to};
         
         int w = w_from, h = h_from;
+        
         if (w > w_to) {
-            float ar = 1.0f * w / w_to; 
-            w /= ar; 
-            h /= ar;
+            float rr = 1.0f * w / w_to; 
+            w /= rr; 
+            h /= rr;
         }
+
         if (h > h_to) {
-            float ar = 1.0f * h / h_to; 
-            w /= ar; 
-            h /= ar;
+            float rr = 1.0f * h / h_to; 
+            w /= rr;
+            h /= rr; 
         }
+
         return {w_to / 2 - w / 2, h_to / 2 - h / 2, w, h};
     }
 
     auto Demo::init_flies() -> bool {
         
-        SDL_Rect new_rect = get_fitted_rect(BMP_->w, BMP_->h, surface_->w * 0.90f, surface_->h * 0.90f);
-        new_rect.x += surface_->w * 0.10f / 2.0f;
-        new_rect.y += surface_->h * 0.10f / 2.0f;
-        SDL_BlitScaled(BMP_, NULL, surface_, &new_rect);
+        SDL_Rect resized_bmp_rect = get_fitted_rect(BMP_->w, BMP_->h, surface_->w * 0.90f, surface_->h * 0.90f);
+        resized_bmp_rect.x += surface_->w * 0.10f / 2.0f;
+        resized_bmp_rect.y += surface_->h * 0.10f / 2.0f;
+        SDL_BlitScaled(BMP_, NULL, surface_, &resized_bmp_rect);
 
-        float ar_w = 1.0f * BMP_->w / new_rect.w;
-        float ar_h = 1.0f * BMP_->h / new_rect.h;
+        // float ar = 1.0f * BMP_->w / BMP_->h;
+        float ar_w = 1.0f * BMP_->w / resized_bmp_rect.w;
+        float ar_h = 1.0f * BMP_->h / resized_bmp_rect.h;
         
-        SDL_Rect new_fly_rect = fly_rect_;
-        new_fly_rect.x /= ar_w;
-        new_fly_rect.y /= ar_h;
-        new_fly_rect.w /= ar_w;
-        new_fly_rect.h /= ar_h;
-        
-        float sample_per_row = 2.0f * N_ / fly_rect_.h;         
-        float size_of_each_step = fly_rect_.w / sample_per_row;
-        
-        float x = new_fly_rect.x + new_rect.x;
-        float y = new_fly_rect.y + new_rect.y;
-        recalc_fly_rect_.w = new_fly_rect.w;
-        recalc_fly_rect_.h = new_fly_rect.h;        
-        recalc_fly_rect_.x = x;
-        recalc_fly_rect_.y = y;
-        
+        SDL_Rect resized_fly_area = fly_area_;
+        resized_fly_area.x /= ar_w;
+        resized_fly_area.y /= ar_h;
+        resized_fly_area.w /= ar_w;
+        resized_fly_area.h /= ar_h;
+        float x = resized_fly_area.x + resized_bmp_rect.x;
+        float y = resized_fly_area.y + resized_bmp_rect.y;
+        recalc_fly_area_.x = x;
+        recalc_fly_area_.y = y;
+        recalc_fly_area_.w = resized_fly_area.w;
+        recalc_fly_area_.h = resized_fly_area.h;        
 
-        // std::cout << "surface.w: " << surface_->w << ", " << "surface.h: " << surface_->h << "\n";
-        // std::cout << "new_rect.x: " << new_rect.x << " new_rect.y: " << new_rect.y << "\n";
-        // std::cout << "ar: " << ar << " fly_rect.x: " << new_fly_rect.x << " fly_rect.y: " << new_fly_rect.y << " - " << new_fly_rect.w << " - " << new_fly_rect.h << "\n";
         std::cout << BMP_->w << " - " << BMP_->h << "\n";
-        std::cout << "new_rect->x: " << new_rect.x << " new_rect->.y: " << new_rect.y << " - " << new_rect.w << " - " << new_rect.h << "\n";
-        std::cout << "recalc_fly_rect_.x: " << recalc_fly_rect_.x << " recalc_fly_rect_.y: " << recalc_fly_rect_.y << " - " << recalc_fly_rect_.w << " - " << recalc_fly_rect_.h << "\n";
+        std::cout << "resized_bmp_rect->x: " << resized_bmp_rect.x << " y: " << resized_bmp_rect.y << " - " << resized_bmp_rect.w << " - " << resized_bmp_rect.h << "\n";
+        std::cout << "resized_fly_area.x: " << resized_fly_area.x << " y: " << resized_fly_area.y << " - " << resized_fly_area.w << " - " << resized_fly_area.h << "\n";
+        std::cout << "recalc_fly_area_.x: " << recalc_fly_area_.x << " y: " << recalc_fly_area_.y << " - " << recalc_fly_area_.w << " - " << recalc_fly_area_.h << "\n";
+
+        float sample_per_row = 2.0f * N_ / fly_area_.h;         
+        float size_of_each_step = fly_area_.w / sample_per_row;
 
         for (Dim i = 0; i < N_; ++i) {
 
@@ -158,8 +158,8 @@ namespace g80 {
                 static_cast<Dim16>(1 + rnd() % FLY_RADIUS_)});
 
             x += size_of_each_step;
-            if (x >= recalc_fly_rect_.x + new_rect.w) {
-                x = recalc_fly_rect_.x;
+            if (x >= recalc_fly_area_.x + resized_bmp_rect.w) {
+                x = recalc_fly_area_.x;
                 ++y;
             }
         }
@@ -200,8 +200,8 @@ namespace g80 {
             fly.xta = (fly.xta + fly.xan) % 360;
             fly.yta = (fly.yta + fly.yan) % 360;
 
-            if (x >= recalc_fly_rect_.x && x <= recalc_fly_rect_.x + recalc_fly_rect_.w &&
-                y >= recalc_fly_rect_.y && y <= recalc_fly_rect_.y + recalc_fly_rect_.h)
+            if (x >= recalc_fly_area_.x && x <= recalc_fly_area_.x + recalc_fly_area_.w &&
+                y >= recalc_fly_area_.y && y <= recalc_fly_area_.y + recalc_fly_area_.h)
                 set_pixel(x, y, fly.e);
         }
 
@@ -212,8 +212,8 @@ namespace g80 {
             fly.xa = (fly.xa + fly.xan) % 360;
             fly.ya = (fly.ya + fly.yan) % 360;
 
-            if (x >= recalc_fly_rect_.x && x <= recalc_fly_rect_.x + recalc_fly_rect_.w &&
-                y >= recalc_fly_rect_.y && y <= recalc_fly_rect_.y + recalc_fly_rect_.h)
+            if (x >= recalc_fly_area_.x && x <= recalc_fly_area_.x + recalc_fly_area_.w &&
+                y >= recalc_fly_area_.y && y <= recalc_fly_area_.y + recalc_fly_area_.h)
                 set_pixel(x, y, fly.c);
         }
         

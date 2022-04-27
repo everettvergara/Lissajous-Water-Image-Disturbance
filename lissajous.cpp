@@ -11,8 +11,9 @@ auto main(int argc, char *argv[]) -> int {
 
     VideoConfig vconfig {set_default_vconfig()};
     // The bounds of the lissajous flies must not be beyond the dim of the image
-    // Demo demo(450000, {0, 700, 1920, 500}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Disturbance/assets/sample-image2.bmp");
+    // Demo demo(400000, {0, 700, 1920, 500}, "/Users/everett/Documents/Codes/Projects/Lissajous-Image-Water-Disturbance/assets/sample-image2.bmp");
     
+
     // TODO: Option to move water sideways i.e. choosing a lissajous pattern 
 
     // bug in sample image1. not getting the h of the image.
