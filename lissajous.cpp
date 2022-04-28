@@ -46,7 +46,7 @@ auto set_default_vconfig() -> VideoConfig {
         {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720},
         // {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1680, 1050},
         // {SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 2560, 1600},
-        SDL_WINDOW_SHOWN | SDL_WINDOW_FULLSCREEN,
+        SDL_WINDOW_SHOWN,
         60
     }; 
     return vconfig;
